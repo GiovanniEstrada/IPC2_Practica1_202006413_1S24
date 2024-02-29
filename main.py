@@ -18,10 +18,11 @@ def registrarCliente(lista):
     NuevoCliente = Cliente(nombre, correo, nit)
     lista.append(NuevoCliente)
 
-def buscarPorNit(listaCliente, nit):
+def buscarPorNit(listaCliente, nit, cli):
     
     for cliente in listaCliente:
         if cliente.nit == nit:
+            cli = cliente
             return True
         
     return False
@@ -34,22 +35,35 @@ def buscarPorCodigo(listaProducto, codigo, prod):
         
     return False
 
+def buscarProducto(ListaProducto, codigo):
+    for producto in ListaProducto:
+        if producto.codigo == codigo:
+            return producto
+    return False
+
+def buscarCliente(ListaCliente, nit):
+    for cliente in ListaCliente:
+        if cliente.nit == nit:
+            return cliente
+    return False
+
 def comprarProducto(listaProducto):
     system("cls")
-    producto = Producto(codigo=None, nombre=None, desc= None, precio=None)
     codProducto = input("Ingrese el codigo de producto: ")
-    if buscarPorCodigo(listaProducto, codProducto, producto):
+    producto = buscarProducto(listaProducto, codProducto)
+    if producto is not None:
         return producto
     else:
-        print("Nit no registrado, vuelva a intentarlo!")
+        print("Producto no registrado, vuelva a intentarlo!")
     return ""
 
 
 def registrarCompra(listaCliente, listaProducto, listaCompra):
     while True:
         nit = input("Ingrese el nit del cliente: ")
+        cliente = Cliente(nombre=None, correo=None, nit=None)
         system("cls")
-        if buscarPorNit(listaCliente, nit):
+        if buscarPorNit(listaCliente, nit, cliente):
             break
         else:
             print("Nit no registrado, vuelva a intentarlo!")
@@ -73,15 +87,46 @@ def registrarCompra(listaCliente, listaProducto, listaCompra):
                 print("Producto no existe, vuelva a intentarlo")
                 continue
             
-            totalCompra += producto.precio
+            totalCompra += int(producto.precio)
             sublistaProductos.append(producto)
 
         elif seleccion == 2:
             id = len(listaCompra) + 1
-            listaCompra.append(sublistaProductos, nit, id, totalCompra, totalCompra * 0.12)
+            compra = Compra(sublistaProductos, nit, id, totalCompra, totalCompra * 0.12)
+            listaCompra.append(compra)
+            return True
 
+def reporteCompra(listaCompra, listaCliente):
+    cliente = Cliente(nombre=None, correo=None, nit=None)
+    system("cls")
+    idCompra = input("Ingrese el ID de compra: ")
+    flgExiste = False
+    for compra in listaCompra:
+        if int(compra.id) != int(idCompra):
+            continue
 
-    
+        print("\n")
+        print(f"------------ REPORTE DE COMPRA {compra.id} ------------")
+        print("CLIENTE: ")
+        cliente = buscarCliente(listaCliente, compra.cliente)
+        print(f"     Nombre:    {cliente.nombre}")
+        print(f"     Correo:    {cliente.correo}")
+        print(f"     Nit:       {cliente.nit}")
+        print("\n\n")
+        print("ARTICULOS COMPRADOS")
+        for producto in compra.lista:
+            print(f"     {producto.nombre}  |  Q {float(producto.precio)}")
+        print("\n\n")
+        print(f"Total: Q {float(compra.total)}")
+        print(f"Impuesto: Q {float(compra.total)}")
+        print("---------------------------------------------------")
+        flgExiste = True
+        break
+
+    if not flgExiste:
+        print(f"No existe compra con ID {idCompra} asignado.")
+
+    input()
 
 def mostrarMenu():
     print("------------- Menú Principal -------------")
@@ -104,8 +149,6 @@ def obtenerOpcion(max):
         except ValueError:
             print("Por favor, ingresa un número válido.")
 
-# Ejemplo de uso:
-
 
 
 def main():
@@ -124,7 +167,15 @@ def main():
             registrarCliente(listaCliente)
         elif seleccion == 3:
             registrarCompra(listaCliente, listaProducto, listaCompras)
-            print("ss")
+        elif seleccion == 4:
+            reporteCompra(listaCompras, listaCliente)
+        elif seleccion == 5:
+            system("cls")
+            print("--------------------------------------------------")
+            print("NOMBRE: CRISTIAN GIOVANNI ESTRADA RAMIREZ")
+            print("CARNET: 202006413")
+            print("--------------------------------------------------")
+            input()
         system("cls")
 
 
